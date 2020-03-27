@@ -1,14 +1,9 @@
 var dropzone;
 
 function setup() {
-    //createCanvas(500, 500);
-    //background(50);
-
     dropzone = select('#dropzone');
     dropzone.dragOver(highlight);
     dropzone.dragLeave(unhighlight);
-    //dropzone.drop(gotFile);
-    dropzone.doubleClicked(mouseClick);
 
     dropzone.elt.addEventListener ("drop", dropFile, false);
 
@@ -17,12 +12,6 @@ function setup() {
         e.preventDefault();
     });
     });
-
-
-}
-
-function draw() {
-  // put drawing code here
 }
 
 function mouseClick() {
@@ -72,4 +61,4 @@ function dropFile(ev) {
 function gotFile(file) {
 }
 
-//Problems: loaded html page doesnt load javascritps & loads n times due to funtion gotFile being called once for every file
+//Problems: Loading... message

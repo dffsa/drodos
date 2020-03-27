@@ -3,6 +3,9 @@
 
 {% block body %}
 
+    <script src="{% static 'sitepr/js/dropzone.js' %}"></script>
+    <div id="p5_loading" class="loadingclass" style="display: none;"></div>
+
     <form action="{% url 'sitepr:upload2'%}" method="post" type="submit" enctype="multipart/form-data" class="dropzone" id="dropzone">
         {% csrf_token %}
         <input type="hidden" name="filesInputId" id="filesInputId" multiple/>
@@ -29,7 +32,7 @@
                     {{ erro }}
                     <script>
                         window.onload = function(){
-                        var name = prompt("Es gay? ");
+                        alert("No files selected ");
                         };
                     </script>
                 {% endif %}
