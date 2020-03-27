@@ -2,3 +2,4 @@
 .idea
 project/project/settings.py
 project/db.sqlite3
+project/media
