@@ -1,0 +1,19 @@
+{%  extends 'sitepr/base.html'%}
+
+{% block body %}
+    <form action="{% url 'sitepr:checkregister'%}" method="post" id="registerForm">
+        {% csrf_token %}
+        <div class="textSide">
+            {{ form }}
+        </div>
+
+        {% block error %}
+        {% endblock %}
+
+        <div class="butSide">
+            <div class="butContainer">
+                <button type="submit" class="skillBut" id="registerBut"><span>Register</span></button>
+            </div>
+        </div>
+    </form>
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends 'sitepr/viewfile2.html' %}
+
+{% block body2 %}
+        <a href="{% url 'sitepr:deletefile' storeditem.fileUrl %}" ><button class="skillBut"><span>Delete</span></button></a>
+        {% if storeditem.owner.profile.premium %}
+            <a href="{% url 'sitepr:changesettings' storeditem.fileUrl %}" ><button class="skillBut"><span>Change Privacy</span></button></a>
+        {% endif %}
+{% endblock %}
+
+{% block visibility %}
+    <div class="tbox">
+    {% if changed %}
+        <div class="tbox"><h3>The file visibility was changed to {{ changed }}.</h3></div>
+    {% endif %}
+    </div>
+{% endblock %}

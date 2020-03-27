@@ -1,0 +1,16 @@
+{%  extends 'sitepr/base.html'%}
+
+{% block body %}
+    <form action="{% url 'sitepr:checklogin'%}" method="post">
+    {% csrf_token %}
+        <div class="textSide">
+            <p><input type="text" name="username" placeholder="Username"></p>
+            <p><input type="password" name="password" placeholder="Password"></p>
+        </div>
+        <div class="butSide">
+            <div class="butContainer">
+                <button type="submit" class="skillBut"><span>Log In</span></button>
+            </div>
+        </div>
+    </form>
+{% endblock %}

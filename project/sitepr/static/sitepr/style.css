@@ -1,0 +1,715 @@
+/* -----------------------
+Base styles
+------------------------*/
+
+/*stop animations firing on page load*/
+.preload * {
+    -webkit-transition: none !important;
+    -moz-transition: none !important;
+    -o-transition: none !important;
+    transition: none !important;
+}
+
+* {
+    outline: none;
+}
+
+ul {
+    margin: 0;
+    padding: 0;
+}
+
+body, html{
+    min-height: 100%;
+    min-width: 430px;
+    margin:0;
+    padding:0;
+}
+
+body {
+	color: #ffffff;
+    background: linear-gradient(95deg, rgb(72, 44, 191) 0%,  rgb(69, 32, 78) 100% );
+	font-family: 'Open Sans', sans-serif;
+    font-weight: 400;
+    font-size: 16px;
+    background-size:cover;
+    padding: 0;
+    margin: 0;
+}
+
+/* Header */
+
+header {
+    background: #222;
+    color: #5628ff;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    min-height: 70px;
+    border-bottom: #cccccc 2px solid;
+    font-size: 8px;
+    margin: 0;
+}
+
+header a{
+    color: #c354ff;
+    text-decoration: none;
+    text-transform: uppercase;
+    font-size: 16px;
+}
+
+header li{
+    float: left;
+    display: inline;
+    padding: 0 20px 0 20px;
+}
+
+header #branding{
+    float: left;
+}
+
+header #brandingIcon{
+    width: 80px;
+    height: 80px;
+    float: left;
+    margin: 0px 10px 0px 10px;
+}
+
+header #branding h1{
+    float: right;
+    margin: 5px 0 5px 20px;
+    font-weight: bold;
+    width: 400px;
+}
+
+header .highlight{
+    color: #ffffff;
+    font-weight: bold;
+    font-size: 50px;
+}
+
+header .current a{
+    color: #ffffff;
+    font-weight: bold;
+}
+
+header a:hover{
+    color: #5628ff;
+    font-weight: bold;
+}
+
+header nav{
+    float: right;
+    text-align: center;
+    margin-top: 40px;
+}
+
+header nav a{
+    color: #ffffff;
+    padding: 0;
+    text-transform: capitalize;
+    font-weight: 600;
+    border-bottom: 2px solid transparent;
+    margin: 5px 5px 5px 5px;
+
+    -webkit-transition: border 0.4s;
+    -moz-transition: border 0.4s;
+    -o-transition: border 0.4s;
+    transition: border 0.4s;
+}
+
+
+
+h1,h2,h3,h4,h5,h6
+{
+	margin: 0;
+	font-weight: 500;
+	line-height: 1.1;
+}
+
+
+h1 { font-size: 2em; }
+h2 { font-size: 1.75em; }
+h3 { font-size: 1.375em; }
+h4 { font-size: 1.125em; }
+h5 { font-size: 1em; }
+h6 { font-size: .875em; }
+
+p {
+	margin: 0 0 1em;
+	line-height: 1.5;
+}
+
+.pNom {
+    margin: 0;
+    font-weight: bold;
+}
+
+.upper {
+    text-transform: uppercase;
+}
+
+small {
+    font-size: 80%;
+}
+
+blockquote {
+	padding: 1em 2em;
+	margin: 0 0 2em;
+	border-left: 5px solid #eee;
+}
+
+hr {
+	height: 0;
+	margin: 0;
+	border: 0;
+	border-top: 1px solid #ddd;
+}
+
+.end {
+    padding: 0 0 20px;
+}
+
+table {
+	background-color: transparent;
+	border-spacing: 0;
+	border-collapse: collapse;
+	border-top: 1px solid #ffffff;
+}
+
+th, td {
+	padding: .5em 1em;
+	vertical-align: top;
+	text-align: left;
+	border-bottom: 1px solid #ddd;
+}
+
+a {
+    text-decoration: none;
+    outline: none;
+}
+
+label{
+    cursor: pointer;
+}
+
+label:hover{
+    color: #000;
+}
+
+/* -----------------------
+Layout styles
+------------------------*/
+
+.container {
+    /*se der merda no container height experimentar uncomment aqui
+    min-height: 100%;
+    */
+    width: 80%;
+	margin: auto;
+    overflow: hidden;
+}
+
+.content {
+    padding-top: 50px;
+    margin: 0;
+    padding-bottom: 70px;
+}
+
+.mainzone {
+    min-width: 430px;
+    min-height: 500px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    width: 100%;
+    text-align: center;
+}
+
+.tbox {
+    text-align: center;
+    padding: 10px 0;
+    color: #FFFFFF;
+}
+
+.tbox-left {
+    text-align: left;
+    padding: 10px 10px;
+}
+
+#groupContainer{
+    display: flex;
+    flex-flow: row;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-evenly;
+    margin-bottom: 25px;
+    min-width: 60%;
+    width: 60%;
+    min-height: 300px;
+}
+
+#groupFiles{
+    float: left;
+    width: 500px;
+    display: flex;
+    flex-flow: column;
+    margin-bottom: 10px;
+    min-height: 300px;
+    padding-bottom: 40px;
+}
+
+#groupMembers{
+    float: right;
+    width: 500px;
+    display: flex;
+    flex-flow: column;
+    margin-bottom: 10px;
+    min-height: 300px;
+    justify-content: flex-start;
+    padding-bottom: 40px;
+}
+
+#groupActionsContainer{
+    display: flex;
+    justify-content: center;
+    width: 60%;
+    margin-bottom: 10px;
+}
+
+#normalGroupActionsContainer{
+    float: left;
+    display: flex;
+    flex-flow: column;
+    margin-right: 20px;
+}
+
+#adminGroupActionsContainer{
+    float: right;
+    display: flex;
+    flex-flow: column;
+    margin-left: 20px;
+}
+
+.title {
+    padding: 20px 0;
+}
+
+form div{
+    min-width: 430px;
+}
+
+.textSide {
+    padding: 10px 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    justify-content: space-between;
+}
+
+#registerForm{
+    line-height: 1.5;
+    color: #ffffff;
+    font-weight: bold;
+}
+
+#registerBut{
+    line-height: 1.5px;
+}
+
+input[type=text], input[type=password], input[type=email] {
+    outline: none;
+    color: #000000;
+    width: auto;
+    height: auto;
+    padding: 15px 30px 15px 30px;
+    border-radius: 100px;
+    border: 2px solid #111111;
+}
+
+
+
+::placeholder{
+    color: #333333;
+}
+
+.butSide {
+    flex: 1;
+}
+
+.butContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center
+}
+
+.errorDisplay {
+    text-transform: capitalize;
+    text-align: center;
+    max-width: 100%;
+    margin-bottom: 5px;
+    font-weight: 700;
+    color: #8790af;
+}
+
+.butContainer input {
+    margin: 5px;
+    color: #ffffff;
+}
+
+.listing {
+    border-top: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+    width: 500px;
+    margin: auto auto -1px auto;
+    line-height: 20px;
+}
+
+.listing a, a:visited {
+    float: left;
+    
+    -webkit-transition: 0.4s;
+    -moz-transition: 0.4s;
+    -o-transition: 0.4s;
+    transition: 0.4s;
+
+    font-weight: 700;
+    color: #fff;
+}
+
+.listing a:hover {
+	color: #222;
+}
+
+.listing span {
+    float: right;
+    white-space: nowrap;
+    max-width: 90%;
+    overflow-x: hidden;
+    color: #fff;
+}
+
+.listing button span {
+    float: none;
+    max-width: none;
+}
+
+.listing button {
+
+    -webkit-transition: 0.4s;
+    -moz-transition: 0.4s;
+    -o-transition: 0.4s;
+    transition: 0.4s;
+
+    background-color: #4CAF50;
+    border: 1px solid green;
+    color: white;
+    padding: 0;
+    text-align: center;
+    text-decoration: none;
+    font-size: 16px;
+    cursor: pointer;
+    width: 150px;
+
+}
+
+.listing button:hover {
+    background-color: #3e8e41;
+}
+
+.single {
+    padding: 10px;
+    border: 0;
+    text-align: center;
+}
+
+.skillBut {
+    outline: none;
+    display: inline-block;
+    border-radius: 50px;
+    background: #222;
+    color: #707bd1;
+    text-align: center;
+    font-size: 18px;
+    line-height: 10px;
+    padding: 20px;
+    width: 175px;
+    cursor: pointer;
+    margin: 5px;
+    border-color: #ffffff;
+    white-space: nowrap;
+}
+
+.skillBut span {
+    cursor: pointer;
+    display: inline-block;
+    position: relative;
+
+    -webkit-transition: 0.5s;
+    -moz-transition: 0.5s;
+    -o-transition: 0.5s;
+    transition: 0.5s;
+}
+
+.skillBut span:after {
+    content: '\00bb';
+    position: absolute;
+    opacity: 0;
+    top: 0;
+    right: -20px;
+
+    -webkit-transition: 0.5s;
+    -moz-transition: 0.5s;
+    -o-transition: 0.5s;
+    transition: 0.5s;
+}
+
+.skillBut:hover span {
+    padding-right: 25px;
+}
+
+.skillBut:hover span:after {
+    opacity: 1;
+    right: 0;
+}
+
+footer {
+	color: #ffffff;
+	background: #222;
+    padding: 15px;
+    text-align: center;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    border-top: #FFFFFF 2px solid;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+/* -----------------------
+Pricing styles
+------------------------*/
+.row {
+    height: 950px;
+}
+
+.col {
+    width: 100%;
+    position: relative;
+    min-height: 1px;
+}
+
+.left {
+    float: left;
+}
+
+.right {
+    float: right;
+}
+
+
+.price-box {
+    border-radius: 5px;
+    text-align: center;
+    color: #707bd1;
+    -webkit-box-shadow: 0 0 15px -5px rgb(77, 67, 198);
+    box-shadow: 0 0 15px -5px rgba(0, 0, 0, 0.1);
+    -webkit-transition: 0.3s;
+    -o-transition: 0.3s;
+    transition: 0.3s;
+}
+
+.normal-box {
+    text-align: center;
+    color: #707bd1;
+    box-shadow: 0 0 50px -15px #111;
+    max-width: 500px;
+    background: #333;
+}
+
+.price-box:hover {
+    -webkit-box-shadow: 0 0 50px -15px #000000;
+    box-shadow: 0 0 50px -15px #111111;
+}
+
+.price-box .price-header {
+    background-color: #f2f3fc;
+    padding: 40px;
+    color: #4d43c6;
+    /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#482cbf+0,6ac6f0+100 */
+    background: rgb(72, 44, 191);
+    /* Old browsers */
+    /* FF3.6-15 */
+    background: -webkit-linear-gradient(45deg, rgba(72, 44, 191, 1) 0%, rgb(69, 32, 78) 100%);
+    /* Chrome10-25,Safari5.1-6 */
+    background: -o-linear-gradient(45deg, rgba(72, 44, 191, 1) 0%, rgb(69, 32, 78) 100%);
+    background: linear-gradient(45deg, rgba(72, 44, 191, 1) 0%, rgb(69, 32, 78) 100%);
+    /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#482cbf', endColorstr='#6ac6f0', GradientType=1);
+    position: relative;
+    overflow: hidden;
+    z-index: 2;
+    -webkit-transition: 0.3s;
+    -o-transition: 0.3s;
+    transition: 0.3s;
+}
+
+.price-body{
+    min-height: 75px;
+}
+
+.price-box .price-header:before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #f2f3fc;
+    z-index: -1;
+    opacity: 1;
+    -webkit-transition: 0.3s;
+    -o-transition: 0.3s;
+    transition: 0.3s;
+}
+
+.price-box:hover .price-header {
+    color: #ffffff;
+}
+
+.price-box:hover .price-header:before {
+    opacity: 0;
+}
+
+.price-box .price-header h4 {
+    font-weight: 700;
+    font-size: 20px;
+    letter-spacing: 3px;
+}
+
+.price-box .price-body {
+    padding: 40px;
+    background: #333333;
+}
+
+.price-box .price-body ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.price-box .price-rate {
+    color: #768ede;
+    background: #333333;
+    padding-bottom: 10px;
+    font-size: 20px;
+}
+
+.price-box .price-rate sup {
+    top: -20px;
+    font-size: 26px;
+}
+
+.price-box .price-rate .rate {
+    font-size: 56px;
+}
+
+.price-box .price-footer {
+    margin-bottom: 40px;
+    background: #333333;
+    padding-bottom: 20px;
+}
+
+/* -----------------------
+Single styles
+------------------------*/
+
+.img-responsive { max-width: 100%; }
+
+#file{
+    opacity: 0;
+    position: absolute;
+    z-index: -1;
+}
+
+.inputfile + label {
+    max-width: 80%;
+    font-size: 17px;
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: pointer;
+    display: inline-block;
+    overflow: hidden;
+    padding: 0.625rem 1.25rem;
+    /* 10px 20px */
+}
+
+.inputfile + label {
+    color: #222;
+}
+
+#fileLabel:hover{
+    color: #fff;
+}
+
+.dropzone {
+    justify-content: center;
+    font-size: 30px;
+    width: 60%;
+    height: 80%;
+    border: 2px dashed #ccc;
+    color: #ccc;
+    line-height: 300px;
+    text-align: center;
+}
+
+.dropzone.dragOver {
+    border: 2px dashed #000;
+    color: #000;
+}
+
+
+/* -----------------------
+Wide styles
+------------------------*/
+
+@media (min-width: 42em)
+{
+	.header { padding: 0; }
+	.nav-bar { padding: 1em 1em; }
+	.footer { padding: 2em 3em; }
+
+	.nav li
+	{
+		display: inline;
+		margin: 0 1em 0 0;
+	}
+
+	.nav a
+	{
+		display: inline;
+        padding: 8px 2px;
+	}
+
+    .content form .textSide {
+        padding: 40px 0 10px 0;
+    }
+
+    .row {
+        height: 500px;
+        width: 800px;
+        margin: auto;
+    }
+
+    .col {
+        width: 45%;
+        position: relative;
+        min-height: 1px;
+        padding-right: 20px;
+        padding-left: 20px;
+    }
+}

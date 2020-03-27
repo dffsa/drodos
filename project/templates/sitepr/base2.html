@@ -1,0 +1,17 @@
+{%  extends 'sitepr/base.html'%}
+
+{% block navbar %}
+    <nav>
+        <ul>
+            <li class="current"><a href="{% url 'sitepr:index'%}"><span>Home</span></a></li>
+            <li class="current"><a href="{% url 'sitepr:myprofile'%}">My Profile</a></li>
+            <li class="current"><a href="{% url 'sitepr:files' %}">Files</a></li>
+            <li class="current"><a href="{% url 'sitepr:groups' %}">Groups</a></li>
+            <li class="current"><a href="{% url 'sitepr:premium' %}">Go Premium</a></li>
+            <li class="current"><a href="{% url 'sitepr:logoutp'%}">Log Out</a></li>
+        </ul>
+    </nav>
+{% endblock %}
+
+{% block body %}
+{% endblock %}

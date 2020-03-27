@@ -1,0 +1,17 @@
+{% extends 'sitepr/base2.html' %}
+
+{% block body %}
+    {% if storeditem %}
+        <div class="tbox"><h2>{{ storeditem.title }}</h2></div>
+        <div class="tbox"><p>{{ storeditem.description }}</p></div>
+        <div class="butContainer">
+            <a href="{% url 'sitepr:download' storeditem.fileUrl %}" ><button class="skillBut"><span>Download</span></button></a>
+            {% block body2 %}
+            {% endblock %}
+        </div>
+
+        {% block visibility %}
+        {% endblock %}
+
+    {% endif %}
+{% endblock %}
