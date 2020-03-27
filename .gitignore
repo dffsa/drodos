@@ -1,0 +1,4 @@
+# Project exclude paths
+.idea
+project/project/settings.py
+project/db.sqlite3
