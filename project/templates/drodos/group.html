@@ -1,0 +1,84 @@
+{% extends 'drodos/base2.html' %}
+
+{% block body %}
+    {% if group %}
+        <div class="tbox" style="padding: 0"><h2>{{ group.name }}</h2></div>
+        <div class="tbox" style="padding: 0"><p>{{ group.description }}</p></div>
+
+        <div class="container" id="groupContainer">
+             <div class="normal-box" id="groupMembers">
+                 <h2 style="margin: 20px 0 20px 0;">Members</h2>
+                {% for user in group.member.all %}
+                <div class="listing" style="margin: 0 20px -1px 20px; width: auto">
+                    <a href="{% url 'drodos:user' user.username %}" >{{ user.username }}</a>
+                    <span>{{ user.profile.bio }}</span>
+                </div>
+                {% endfor %}
+             </div>
+
+            <div class="normal-box" id="groupFiles">
+                <h2 style="margin: 20px 0 20px 0;">Files</h2>
+            {% for storeditem in group.item.all %}
+                <div class="listing" style="margin: 0 20px -1px 20px; width: auto">
+                    <a href="{% url 'drodos:file' storeditem.fileUrl%}">{{ storeditem.title }}</a>
+                    <span>{{ storeditem.description }}</span>
+                </div>
+            {% endfor %}
+            </div>
+        </div>
+    {% endif %} <!-- memes-->
+
+    <div class="container" id="groupActionsContainer">
+        <div class="butContainer" id="normalGroupActionsContainer">
+            <a href="{% url 'drodos:addfile' group.name %}"><button class="skillBut"><span>Add File</span></button></a>
+            <a href="{% url 'drodos:removefile' group.name %}"><button class="skillBut"><span>Remove File</span></button></a>
+            <a href="{% url 'drodos:leavegroup' group.name %}"><button class="skillBut"><span>Leave Group</span></button></a>
+        </div>
+        {% block body2 %}
+        {% endblock %}
+    </div>
+
+
+    {% if addfileform %}
+        {% if useritems.count > 0 %}
+
+            <div class="tbox" style="padding-bottom: 0"><h4>File to add:</h4></div>
+
+            <form action="{% url 'drodos:addedfile' group.name%}" method="post" >
+            {% csrf_token %}
+            {% for storeditem in useritems %}
+                <div class="listing">
+                    <button type="submit" name="storeditem" value="{{ storeditem.id }}"><span>{{ storeditem.title }}</span></button>
+                    <span>{{ storeditem.description }}</span>
+                </div>
+            {% endfor %}
+            </form>
+        {% else %}
+                <div class="tbox"><h4>You don't have any files to add!</h4></div>
+        {% endif %}
+
+    {% endif %}
+
+    {% if removefileform %}
+        {% if usergroupitems  %}
+            <div class="tbox"><h4>File to remove:</h4></div>
+
+            <form action="{% url 'drodos:removedfile' group.name%}" method="post" >
+            {% csrf_token %}
+            {% for storeditem in usergroupitems %}
+                <div class="listing">
+                    <button type="submit" name="storeditem" value="{{ storeditem.id }}"><span>{{ storeditem.title }}</span></button>
+                <span>{{ storeditem.description }}</span>
+            </div>
+            {% endfor %}
+             </form>
+            <hr class="end">
+            {% else %}
+                <div class="tbox"><h4>You don't have any files to remove!</h4></div>
+            {% endif %}
+    {% endif %}
+
+    {% if erro %}
+        <div class="tbox"><h4>{{ erro }}</h4></div>
+    {% endif %}
+{% endblock %}

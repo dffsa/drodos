@@ -1,0 +1,7 @@
+{%  extends 'drodos/base.html'%}
+
+{% block body %}
+    <div class="tbox"><h2>You file was successfuly uploaded!</h2></div>
+    <div class="listing single"><h3><a href="{% url 'drodos:file' filename %}">{{ filename }}</a></h3></div>
+{% endblock %}
+

@@ -1,0 +1,17 @@
+{%  extends 'drodos/base.html'%}
+
+{% block navbar %}
+    <nav>
+        <ul>
+            <li class="current"><a href="{% url 'drodos:index'%}"><span>Home</span></a></li>
+            <li class="current"><a href="{% url 'drodos:myprofile'%}">My Profile</a></li>
+            <li class="current"><a href="{% url 'drodos:files' %}">Files</a></li>
+            <li class="current"><a href="{% url 'drodos:groups' %}">Groups</a></li>
+            <li class="current"><a href="{% url 'drodos:premium' %}">Go Premium</a></li>
+            <li class="current"><a href="{% url 'drodos:logoutp'%}">Log Out</a></li>
+        </ul>
+    </nav>
+{% endblock %}
+
+{% block body %}
+{% endblock %}
