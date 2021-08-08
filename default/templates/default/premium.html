@@ -1,0 +1,50 @@
+{% extends 'default/base2.html' %}
+
+{% block body %}
+
+    <div class="tbox title"><h2>Our Awesome Pricing Plans</h2></div>
+
+    <div class="row">
+        <div class="col left">
+            <div class="price-box">
+                <div class="price-header">
+                    <h4 class="upper">Free</h4>
+                </div>
+                <div class="price-body">
+                    <ul>
+                        <li>Max 10Mb Storage</li>
+                        <li>Public files only</li>
+                    </ul>
+                </div>
+                <div class="price-rate">
+                    <sup>&#36;</sup> <span class="rate">0</span> <small>/Month</small>
+                </div>
+                <div class="price-footer">
+                    <a href="{% url 'default:gonormal' %}" ><button class="skillBut"><span>Go Free</span></button></a>
+                </div>
+            </div>
+        </div>
+        <div class="col right">
+            <div class="price-box">
+                <div class="price-header">
+                    <h4 class="upper">Premium</h4>
+                </div>
+                <div class="price-body">
+                    <ul>
+                        <li>Max 100Mb storage</li>
+                        <li>Public and private files</li>
+                        <li>Crate and join groups</li>
+                        <li>Share files in groups</li>
+                    </ul>
+                </div>
+                <div class="price-rate">
+                    <sup>&#36;</sup> <span class="rate">99</span> <small>/Month</small>
+                </div>
+                <div class="price-footer">
+                    <a href="{% url 'default:gopremium' %}" ><button class="skillBut"><span>Go Premium</span></button></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

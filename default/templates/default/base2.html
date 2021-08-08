@@ -1,0 +1,17 @@
+{%  extends 'default/base.html'%}
+
+{% block navbar %}
+    <nav>
+        <ul>
+            <li class="current"><a href="{% url 'default:index'%}"><span>Home</span></a></li>
+            <li class="current"><a href="{% url 'default:myprofile'%}">My Profile</a></li>
+            <li class="current"><a href="{% url 'default:files' %}">Files</a></li>
+            <li class="current"><a href="{% url 'default:groups' %}">Groups</a></li>
+            <li class="current"><a href="{% url 'default:premium' %}">Go Premium</a></li>
+            <li class="current"><a href="{% url 'default:logoutp'%}">Log Out</a></li>
+        </ul>
+    </nav>
+{% endblock %}
+
+{% block body %}
+{% endblock %}
