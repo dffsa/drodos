@@ -41,7 +41,7 @@ function dropFile(ev) {
     }
 
     var xhr = new XMLHttpRequest();
-    xhr.open('POST', 'http://127.0.0.1:8000/drodos/upload2/', true);
+    xhr.open('POST', '/upload2/', true);
 
     xhr.addEventListener('readystatechange', function(e) {
     if (xhr.readyState == 4 && xhr.status == 200) {

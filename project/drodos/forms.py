@@ -1,5 +1,5 @@
 from django import forms
-from drodos.models import User, Group
+from models import User, Group
 
 
 class RegisterForm(forms.ModelForm):

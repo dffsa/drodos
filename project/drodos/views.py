@@ -145,7 +145,7 @@ def upload2(request):
             files = request.FILES.getlist('filesInputId')
             if request.user.is_authenticated:
                 for f in files:
-                    if request.user.profile.currentStorage + f.size > request.user.profile.maxStorage:
+                    if request.user.profile.currentStorage + f.size/1000 > request.user.profile.maxStorage:
                         return HttpResponseRedirect(reverse('drodos:myprofile'))
                     else:
                         fs = FileSystemStorage()
@@ -174,6 +174,8 @@ def upload2(request):
                         tempitem = StoredItem(owner=None, title=f.name,
                                               fileUrl=filename, description='', private=False)
                         tempitem.save()
+                        return HttpResponseRedirect(reverse('drodos:file', args=[filename]))
+                    else: HttpResponseRedirect(reverse('drodos:index'))
             return HttpResponseRedirect(reverse('drodos:index'))
     else:
         return HttpResponseRedirect(reverse('drodos:index'))
