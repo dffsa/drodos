@@ -1,0 +1,21 @@
+{% extends 'base2.html' %}
+
+{% block body %}
+
+    <form action="{% url 'dropbox:savegroup'%}" method="post">
+    {% csrf_token %}
+        <div class="textSide">
+            {{ form }}
+        </div>
+
+        {% if erro %}
+            <div class="tbox"><h3>{{ erro }}</h3></div>
+        {% endif %}
+
+        <div class="butSide">
+            <div class="butContainer">
+                <button type="submit" class="skillBut"><span>Create Group</span></button>
+            </div>
+        </div>
+    </form>
+{% endblock %}

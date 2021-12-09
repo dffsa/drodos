@@ -1,0 +1,17 @@
+{%  extends 'base.html'%}
+
+{% block navbar %}
+    <nav>
+        <ul>
+            <li class="current"><a href="{% url 'dropbox:index'%}"><span>Home</span></a></li>
+            <li class="current"><a href="{% url 'dropbox:myprofile'%}">My Profile</a></li>
+            <li class="current"><a href="{% url 'dropbox:files' %}">Files</a></li>
+            <li class="current"><a href="{% url 'dropbox:groups' %}">Groups</a></li>
+            <li class="current"><a href="{% url 'dropbox:premium' %}">Go Premium</a></li>
+            <li class="current"><a href="{% url 'dropbox:logoutp'%}">Log Out</a></li>
+        </ul>
+    </nav>
+{% endblock %}
+
+{% block body %}
+{% endblock %}

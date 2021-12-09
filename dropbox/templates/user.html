@@ -1,0 +1,10 @@
+{% extends 'base2.html' %}
+
+{% block body %}
+    {% if user %}
+
+        <div class="tbox"><h2>{{ user.username }} {% if user.profile.premium %}👑{% endif %}</h2></div>
+        <div class="tbox"><p class="pNom">{{ user.profile.bio }}</p></div>
+    {% endif %}
+
+{% endblock %}

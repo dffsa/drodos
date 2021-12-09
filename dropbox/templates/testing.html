@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    {% load static %}
+    <script src="{% static 'dropbox/js/p5.js' %}"></script>
+    <script src="{% static 'dropbox/js/p5.sound.js' %}"></script>
+    <script src="{% static 'dropbox/js/sketch.js' %}"></script>
+
+    <style>
+        .dropzone {
+            font-size: 30px;
+            width: 50%;
+            height: 80%;
+            border: 2px dashed #ccc;
+            color: #ccc;
+            line-height: 300px;
+            text-align: center;
+            user-select: none;
+            -moz-user-select: none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+            -o-user-select: none;
+        }
+
+        .dropzone.dragOver {
+            border: 2px dashed #000;
+            color: #000;
+        }
+    </style>
+
+</head>
+<body>
+    <form action="{% url 'dropbox:upload2'%}" method="post" type="submit" enctype="multipart/form-data" class="dropzone" id="dropzone">
+        {% csrf_token %}
+        <input type="hidden" name="filesInputId" id="filesInputId" multiple/>
+        Drop to Upload
+    </form>
+</body>
+</html>
