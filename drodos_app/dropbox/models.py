@@ -9,10 +9,10 @@ from django.dispatch import receiver
 
 
 class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, unique=True)
     bio = models.TextField(max_length=500, blank=True, null=True)
     premium = models.BooleanField(default=False)
-    maxStorage = models.IntegerField(default=10000)
+    maxStorage = models.IntegerField(default=10000000)
     currentStorage = models.IntegerField(default=0)
 
     @receiver(post_save, sender=User)
@@ -29,14 +29,13 @@ class Profile(models.Model):
 
 
 class StoredItem(models.Model):
+    fileUrl = models.CharField(max_length=100, blank=False, unique=True)
     owner = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
-    title = models.CharField(max_length=100)
     description = models.CharField(max_length=200)
-    fileUrl = models.CharField(max_length=100, null=True)
     private = models.BooleanField(default=True)
 
     def __str__(self):
-        return self.title
+        return self.fileUrl
 
     def sharedwith(self, user):
         groups = Group.objects.filter(member=user)

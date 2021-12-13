@@ -1,7 +1,7 @@
 {%  extends 'base.html'%}
 
 {% block body %}
-    <form action="{% url 'dropbox:checkregister'%}" method="post" id="registerForm">
+    <form action="{% url 'dropbox:register'%}" method="post" id="registerForm">
         {% csrf_token %}
         <div class="textSide">
             {{ form }}

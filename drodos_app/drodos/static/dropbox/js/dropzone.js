@@ -41,7 +41,7 @@ function dropFile(ev) {
     }
 
     var xhr = new XMLHttpRequest();
-    xhr.open('POST', '/upload2/', true);
+    xhr.open('POST', '/upload/', true);
 
     xhr.addEventListener('readystatechange', function(e) {
     if (xhr.readyState == 4 && xhr.status == 200) {

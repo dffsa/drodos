@@ -6,8 +6,10 @@
         <h2 style="padding: 20px 0 20px 0;">Files</h2>
         {% for storeditem in files %}
             <div class="listing" style="margin: 0 20px -1px 20px; width: auto">
-                ​<a href="{% url 'dropbox:file' storeditem.fileUrl %}" >{{ storeditem.title}}</a>
-                <span>{{ storeditem.description}}</span>
+                ​<a href="{% url 'dropbox:file' storeditem.fileUrl %}" >{{ storeditem.fileUrl}}</a>
+                {% if storeditem.description %}
+                    <span>{{ storeditem.description}}</span>
+                {% endif %}
             </div>
         {% endfor %}
         </div>

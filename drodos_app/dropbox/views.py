@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 # Create your views here.
 from django.http import Http404, HttpResponse, HttpResponseRedirect
@@ -6,7 +6,7 @@ from django.shortcuts import render, get_object_or_404
 from .models import *
 from django.urls import reverse
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login as d_login, logout as d_logout
 from django.core.files.storage import FileSystemStorage
 from .forms import RegisterForm, GroupForm
 
@@ -21,171 +21,101 @@ def index(request):
         return render(request, 'index.html')
 
 
-def loginp(request):
-    if request.user.is_authenticated:
-        return render(request, 'home.html', {'user': request.user})
-    else:
-        return render(request, 'login.html')
-
-
-def logoutp(request):
-    logout(request)
-    return render(request, 'index.html')
-    HttpResponseRedirect(reverse('dropbox:index'))
-
-
 def register(request):
-    if request.user.is_authenticated:
-        return render(request, 'home.html', {'user': request.user})
-    else:
-        form = RegisterForm()
-        return render(request, 'register.html', {'form': form})
-
-
-def checklogin(request):
-    username = request.POST['username']
-    password = request.POST['password']
-    # check for password
-    user = authenticate(username=username, password=password)
-    if user is not None:
-        # valid login
-        login(request, user)
-        #print(request.user.profile.bio)
-        return HttpResponseRedirect(reverse('dropbox:index'))
-    else:
-        # invalid login
-        return HttpResponseRedirect(reverse('dropbox:loginp'))
-
-
-def checkregister(request):
-    if not (User.objects.filter(username=request.POST['username']).exists() or User.objects.filter(
-            email=request.POST['email']).exists()):
-        form = RegisterForm(request.POST)
-        if form.is_valid():
-            user = User.objects.create_user(request.POST['username'], request.POST['email'], request.POST['password'])
-            user.profile.maxStorage = 10000
-            user.profile.bio = request.POST['biography']
-            user.save()
-            return HttpResponseRedirect(reverse('dropbox:registered'))
+    if request.method == 'GET':
+        if request.user.is_authenticated:
+            return render(request, 'home.html', {'user': request.user})
         else:
-            return HttpResponseRedirect(reverse('dropbox:registerfail', ))
+            form = RegisterForm()
+            return render(request, 'register.html', {'form': form})
+    elif request.method == 'POST':
+        form = RegisterForm(request.POST)
+        if not (User.objects.filter(username=request.POST['username']).exists() or User.objects.filter(
+                email=request.POST['email']).exists()):
+            if form.is_valid():
+                user = User.objects.create_user(request.POST['username'], request.POST['email'],
+                                                request.POST['password'])
+                user.profile.bio = request.POST['biography']
+                user.save()
+                return render(request, 'registered.html')
+            else:
+                return render(request, 'registerfail.html', {'form': form})
+        else:
+            return render(request, 'registerfail.html', {'form': form})
+
+
+def login(request):
+    if request.method == 'GET':
+        if request.user.is_authenticated:
+            return render(request, 'home.html', {'user': request.user})
+        else:
+            return render(request, 'login.html')
+    elif request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+
+        user = authenticate(username=username, password=password)
+
+        if user is not None:
+            d_login(request, user)
+            return HttpResponseRedirect(reverse('dropbox:myprofile'))
+        else:
+            return HttpResponseRedirect(reverse('dropbox:login'))
     else:
-        return HttpResponseRedirect(reverse('dropbox:registerfail', ))
+        return render(reverse('dropbox:index'))
 
 
-def registerfail(request):
+def logout(request):
+    d_logout(request)
+    return HttpResponseRedirect(reverse('dropbox:index'))
+
+
+def myprofile(request):
     if request.user.is_authenticated:
-        return render(request, 'home.html', {'user': request.user})
+        return render(request, 'myprofile.html', {'user': request.user})
     else:
-        form = RegisterForm()
-        return render(request, 'registerfail.html', {'form': form})
-
-
-def registered(request):
-    if request.user.is_authenticated:
-        return render(request, 'home.html', {'user': request.user})
-    else:
-        return render(request, 'registered.html')
+        return HttpResponseRedirect(reverse('dropbox:index'))
 
 
 def upload(request):
     if request.method == 'POST':
-        print(request.FILES)
         if not request.FILES:
-            if request.user.is_authenticated:
-                return render(request, 'home.html', {'erro': 'no file selected', 'user': request.user})
-            else:
-                return render(request, 'index.html', {'erro': 'no file selected'})
-        else:
-            file = request.FILES['file']
-            fs = FileSystemStorage()
-            filename = fs.save(fs.get_available_name(file.name), file)
-            size = int(fs.size(filename) / 1000)
-            print(str(size) + ' kb')
-            if request.user.is_authenticated:
-                if request.user.profile.currentStorage + size > request.user.profile.maxStorage:  # max storage reached
-                    fs.delete(filename)
-                    return HttpResponseRedirect(reverse('dropbox:myprofile'))
-                else:  # proceed with upload
-                    if request.POST.get('private') and request.user.profile.premium:
-                        storeditem = StoredItem(owner=request.user, title=request.POST['title'],
-                                                fileUrl=filename, description=request.POST['desc'],
-                                                private=True)
-                        print('PRIVATE')
-                    else:
-                        storeditem = StoredItem(owner=request.user, title=request.POST['title'],
-                                                fileUrl=filename, description=request.POST['desc'],
-                                                private=False)
-                        print('PUBLIC')
-                    request.user.profile.currentStorage += size
-                    request.user.save()
-                    storeditem.save()
-                    return HttpResponseRedirect(reverse('dropbox:files'))
-            else:  # unregistered user upload
-                if size > 1000:  # too big for unregistered
-                    fs.delete(filename)
-                    return HttpResponseRedirect(reverse('dropbox:index'))
-                else:
-                    tempitem = StoredItem(owner=None, title=request.POST['title'],
-                                          fileUrl=filename, description=request.POST['desc'], private=False)
-                    tempitem.save()
-                    return HttpResponseRedirect(reverse('dropbox:uploaded', args=(filename,)))
-    else:
-        return HttpResponseRedirect(reverse('dropbox:index'))
-
-
-def upload2(request):
-    if request.method == 'POST':
-        if not request.FILES:
-            if request.user.is_authenticated:
-                return render(request, 'home.html', {'erro': 'no file selected', 'user': request.user})
-            else:
-                return render(request, 'index.html', {'erro': 'no file selected'})
+            return render(request, 'index.html', {'error_message': 'no file selected'})
         else:
             files = request.FILES.getlist('filesInputId')
+            fs = FileSystemStorage()
             if request.user.is_authenticated:
                 for f in files:
-                    if request.user.profile.currentStorage + f.size/1000 > request.user.profile.maxStorage:
-                        return HttpResponseRedirect(reverse('dropbox:myprofile'))
+                    filename = fs.save(fs.get_available_name(f.name), f)
+                    size = fs.size(filename)
+                    if request.user.profile.currentStorage + size > request.user.profile.maxStorage:
+                        fs.delete(filename)
+                        return render(request, 'index.html',
+                                      {'error_message': 'you don\'t have sufficient storage capacity'})
                     else:
-                        fs = FileSystemStorage()
-                        filename = fs.save(fs.get_available_name(f.name), f)
-                        size = int(fs.size(filename) / 1000)
-                        print(str(size) + ' kb')
-                        if request.POST.get('private') and request.user.profile.premium:
-                            storeditem = StoredItem(owner=request.user, title=f.name,
-                                                    fileUrl=filename, description='',
-                                                    private=True)
-                        else:
-                            storeditem = StoredItem(owner=request.user, title=f.name,
-                                                    fileUrl=filename, description='',
-                                                    private=False)
+                        stored_item = StoredItem(owner=request.user,
+                                                 fileUrl=filename, description=request.POST.get('desc', ''),
+                                                 private=request.POST.get('asd', False))
                         request.user.profile.currentStorage += size
                         request.user.save()
-                        storeditem.save()
+                        stored_item.save()
                 return HttpResponseRedirect(reverse('dropbox:files'))
             else:  # unregistered user upload
                 for f in files:
-                    if f.size < 1000000:  # too big for unregistered
-                        fs = FileSystemStorage()
-                        filename = fs.save(fs.get_available_name(f.name), f)
-                        size = int(fs.size(filename) / 1000)
-                        print(str(size) + ' kb')
-                        tempitem = StoredItem(owner=None, title=f.name,
-                                              fileUrl=filename, description='', private=False)
-                        tempitem.save()
-                        return HttpResponseRedirect(reverse('dropbox:file', args=[filename]))
-                    else: HttpResponseRedirect(reverse('dropbox:index'))
-            return HttpResponseRedirect(reverse('dropbox:index'))
+                    filename = fs.save(fs.get_available_name(f.name), f)
+                    size = fs.size(filename)
+                    if size > 1000000:
+                        fs.delete(filename)
+                        return render(request, 'index.html',
+                                      {'error_message': 'File too big!'})
+                    else:
+                        temp_item = StoredItem(owner=None,
+                                               fileUrl=filename, description=request.POST.get('desc', ''),
+                                               private=False)
+                        temp_item.save()
+                return render(request, 'uploaded.html', {'filename': filename})
     else:
         return HttpResponseRedirect(reverse('dropbox:index'))
-
-
-def uploaded(request, filename):
-    if request.user.is_authenticated:
-        return render(request, 'home.html', {'user': request.user})
-    else:
-        return render(request, 'uploaded.html', {'filename': filename})
 
 
 def download(request, filename):
@@ -226,6 +156,7 @@ def files(request):
 
 def file(request, filename):
     storeditem = get_object_or_404(StoredItem, fileUrl=filename)
+
     if request.user.is_authenticated:
         if storeditem.owner == request.user:
             return render(request, 'file.html', {'storeditem': storeditem})
@@ -308,10 +239,10 @@ def addfile(request, groupname):
         useritems = StoredItem.objects.filter(owner=request.user)
         if group.isowner(request.user):
             return render(request, 'groupowner.html', {'addfileform': True, 'group': group,
-                                                              'useritems': useritems})
+                                                       'useritems': useritems})
         else:
             return render(request, 'group.html', {'addfileform': True, 'group': group,
-                                                         'useritems': useritems})
+                                                  'useritems': useritems})
     else:
         return HttpResponseRedirect(reverse('dropbox:index'))
 
@@ -322,7 +253,7 @@ def removefile(request, groupname):
         useritems = StoredItem.objects.filter(owner=request.user)
         if group.isowner(request.user):
             return render(request, 'groupowner.html', {'removefileform': True, 'group': group,
-                                                              'useritems': useritems})
+                                                       'useritems': useritems})
         else:
             usergroupitems = []
             for storeditem in useritems:
@@ -330,7 +261,7 @@ def removefile(request, groupname):
                     usergroupitems.append(storeditem)
             print(usergroupitems)
             return render(request, 'group.html', {'removefileform': True, 'group': group,
-                                                         'usergroupitems': usergroupitems})
+                                                  'usergroupitems': usergroupitems})
     else:
         return HttpResponseRedirect(reverse('dropbox:index'))
 
@@ -418,12 +349,12 @@ def addedfile(request, groupname):
                 useritems = StoredItem.objects.filter(owner=request.user)
                 if group.isowner(request.user):
                     return render(request, 'groupowner.html', {'addfileform': True, 'group': group,
-                                                                      'useritems': useritems,
-                                                                      'erro': 'File is already added in the group!'})
+                                                               'useritems': useritems,
+                                                               'erro': 'File is already added in the group!'})
                 else:
                     return render(request, 'group.html', {'addfileform': True, 'group': group,
-                                                                 'useritems': useritems,
-                                                                 'erro': 'File is already added in the group!'})
+                                                          'useritems': useritems,
+                                                          'erro': 'File is already added in the group!'})
     else:
         return HttpResponseRedirect(reverse('dropbox:index'))
 
@@ -535,14 +466,6 @@ def user(request, username):
         return HttpResponseRedirect(reverse('dropbox:index'))
 
 
-def myprofile(request):
-    if request.user.is_authenticated:
-        user = get_object_or_404(User, username=request.user.username)
-        return render(request, 'myprofile.html', {'user': user})
-    else:
-        return HttpResponseRedirect(reverse('dropbox:index'))
-
-
 def premium(request):
     if request.user.is_authenticated:
         return render(request, 'premium.html', {'user': user})
@@ -553,7 +476,7 @@ def premium(request):
 def gopremium(request):
     if request.user.is_authenticated:
         request.user.profile.premium = True
-        request.user.profile.maxStorage = 100000
+        request.user.profile.maxStorage = 1000000000
         request.user.save()
         return HttpResponseRedirect(reverse('dropbox:myprofile'))
     else:
@@ -563,11 +486,12 @@ def gopremium(request):
 def gonormal(request):
     if request.user.is_authenticated:
         request.user.profile.premium = False
-        request.user.profile.maxStorage = 10000
+        request.user.profile.maxStorage = 10000000
         request.user.save()
         return HttpResponseRedirect(reverse('dropbox:myprofile'))
     else:
         return HttpResponseRedirect(reverse('dropbox:index'))
+
 
 def testing(request):
     return render(request, 'testing.html')
