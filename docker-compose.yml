@@ -15,9 +15,13 @@ services:
   web:
     build: .
     restart: always
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=$drodos_postgres_user
+      - POSTGRES_PASSWORD=$drodos_postgres_password
     command: $drodos_web_command
     volumes:
-      - ./drodos_app:/drodos
+      - .:/drodos
       - ./data/media:/data/media
     ports:
       - "8000:8000"
