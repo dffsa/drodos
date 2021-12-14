@@ -90,12 +90,17 @@ def upload(request):
                     size = fs.size(filename)
                     if request.user.profile.currentStorage + size > request.user.profile.maxStorage:
                         fs.delete(filename)
-                        return render(request, 'index.html',
-                                      {'error_message': 'you don\'t have sufficient storage capacity'})
+                        # return render(request, 'index.html',
+                        # {'error_message': 'you don\'t have sufficient storage capacity'})
+                        return HttpResponseRedirect(reverse('dropbox:index'))
                     else:
+                        private = False
+                        if request.POST.get('private') == 'on':
+                            private = True
+
                         stored_item = StoredItem(owner=request.user,
                                                  fileUrl=filename, description=request.POST.get('desc', ''),
-                                                 private=request.POST.get('asd', False))
+                                                 private=private)
                         request.user.profile.currentStorage += size
                         request.user.save()
                         stored_item.save()
@@ -106,16 +111,15 @@ def upload(request):
                     size = fs.size(filename)
                     if size > 1000000:
                         fs.delete(filename)
-                        return render(request, 'index.html',
-                                      {'error_message': 'File too big!'})
+                        # return render(request, 'index.html',
+                        #             {'error_message': 'File too big!'}
+                        return HttpResponseRedirect(reverse('dropbox:index'))
                     else:
                         temp_item = StoredItem(owner=None,
                                                fileUrl=filename, description=request.POST.get('desc', ''),
                                                private=False)
                         temp_item.save()
-                return render(request, 'uploaded.html', {'filename': filename})
-    else:
-        return HttpResponseRedirect(reverse('dropbox:index'))
+                return HttpResponseRedirect(reverse('dropbox:file', kwargs={'filename': filename}))
 
 
 def download(request, filename):
@@ -128,7 +132,6 @@ def download(request, filename):
                 with open(path, 'rb') as f:
                     response = HttpResponse(f.read(), content_type="application/download")
                     response['Content-Disposition'] = 'inline; filename=' + filename
-                    print('file downloaded')
                     return response
             else:  # download denied to user
                 return HttpResponseRedirect(reverse('dropbox:index'))
