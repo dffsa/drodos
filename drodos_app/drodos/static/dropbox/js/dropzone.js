@@ -57,8 +57,3 @@ function dropFile(ev) {
     });
     xhr.send(formData);
 }
-
-function gotFile(file) {
-}
-
-//Problems: Loading... message
