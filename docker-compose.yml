@@ -9,7 +9,7 @@ services:
       - POSTGRES_USER=$drodos_postgres_user
       - POSTGRES_PASSWORD=$drodos_postgres_password
     volumes:
-      - ./data/db:/var/lib/postgresql/data
+      - db_data:/var/lib/postgresql/data  # create volume for DB persistence
     ports:
       - "5432:5432"
   web:
@@ -19,11 +19,13 @@ services:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=$drodos_postgres_user
       - POSTGRES_PASSWORD=$drodos_postgres_password
-    command: $drodos_web_command
+    entrypoint: /drodos/entrypoint_dev.sh
     volumes:
-      - .:/drodos
-      - ./data/media:/data/media
+      - ./drodos:/drodos/drodos     # bind drodos folder to host os
+      - ./dropbox:/drodos/dropbox   # bind app folder to host os
     ports:
       - "8000:8000"
     depends_on:
       - db
+volumes:
+  db_data:
