@@ -41,15 +41,22 @@
                         </a>
                         <h1><span class="highlight">Drodos</span><br>Cloud storage for the people</h1>
                     </div>
-                    {% block navbar %}
-			        <nav>
-				        <ul>
+                    <nav>
+                        <ul>
+                        {% if user.is_authenticated %}
+                            <li class="current"><a href="{% url 'dropbox:index'%}"><span>Home</span></a></li>
+                            <li class="current"><a href="{% url 'dropbox:my_profile'%}">My Profile</a></li>
+                            <li class="current"><a href="{% url 'dropbox:files' %}">Files</a></li>
+                            <li class="current"><a href="{% url 'dropbox:groups' %}">Groups</a></li>
+                            <li class="current"><a href="{% url 'dropbox:premium' %}">Go Premium</a></li>
+                            <li class="current"><a href="{% url 'dropbox:logout'%}">Log Out</a></li>
+                        {% else %}
                             <li class="current"><a href="{% url 'dropbox:index'%}"><span>Home</span></a></li>
                             <li class="current"><a href="{% url 'dropbox:login'%}"><span>Log In</span></a></li>
-					        <li class="current"><a href="{% url 'dropbox:register'%}"><span>Register</span></a></li>
-				        </ul>
-			        </nav>
-                    {% endblock %}
+                            <li class="current"><a href="{% url 'dropbox:register'%}"><span>Register</span></a></li>
+                        {% endif %}
+                        </ul>
+                    </nav>
                 </div>
 			</header>
 

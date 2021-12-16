@@ -14,16 +14,13 @@ from .forms import RegisterForm, GroupForm
 def index(request):
     print(User.objects.all())
     print('currently logged in as :' + request.user.username)
-    if request.user.is_authenticated:
-        return render(request, 'home.html')
-    else:
-        return render(request, 'index.html')
+    return render(request, 'home.html')
 
 
 def register(request):
     if request.method == 'GET':
         if request.user.is_authenticated:
-            return render(request, 'home.html', {'user': request.user})
+            return render(request, 'home.html')
         else:
             form = RegisterForm()
             return render(request, 'register.html', {'form': form})
@@ -79,7 +76,7 @@ def my_profile(request):
 def upload(request):
     if request.method == 'POST':
         if not request.FILES:
-            return render(request, 'index.html', {'error_message': 'no file selected'})
+            return render(request, 'home.html', {'error_message': 'no file selected'})
         else:
             files = request.FILES.getlist('filesInputId')
             fs = FileSystemStorage()
@@ -89,7 +86,7 @@ def upload(request):
                     size = fs.size(filename)
                     if request.user.profile.currentStorage + size > request.user.profile.maxStorage:
                         fs.delete(filename)
-                        # return render(request, 'index.html',
+                        # return render(request, 'home.html',
                         # {'error_message': 'you don\'t have sufficient storage capacity'})
                         return HttpResponseRedirect(reverse('dropbox:index'))
                     else:
@@ -110,7 +107,7 @@ def upload(request):
                     size = fs.size(filename)
                     if size > 1000000:
                         fs.delete(filename)
-                        # return render(request, 'index.html',
+                        # return render(request, 'home.html',
                         #             {'error_message': 'File too big!'}
                         return HttpResponseRedirect(reverse('dropbox:index'))
                     else:
@@ -176,7 +173,7 @@ def groups(request):
         return render(request, 'groups.html',
                       {'groups': Group.objects.filter(member=request.user), 'user': request.user})
     else:
-        return render(request, 'index.html')
+        return render(request, 'home.html')
 
 
 def group(request, group_name):
@@ -244,11 +241,11 @@ def add_file(request, group_name):
                 if group.isowner(request.user):
                     return render(request, 'group_owner.html', {'addfileform': True, 'group': group,
                                                                 'useritems': useritems,
-                                                                'erro': 'File is already added in the group!'})
+                                                                'error_message': 'File is already added in the group!'})
                 else:
                     return render(request, 'group_member.html', {'addfileform': True, 'group': group,
                                                                  'useritems': useritems,
-                                                                 'erro': 'File is already added in the group!'})
+                                                                 'error_message': 'File is already added in the group!'})
     return HttpResponseRedirect(reverse('dropbox:index'))
 
 
@@ -357,11 +354,11 @@ def send_group_invite(request, group_name):
             if group.ismember(invited):
                 # invited is already a member
                 return render(request, 'group_owner.html',
-                              {'group': group, 'erro': 'User is already a member!', 'inviteform': True})
+                              {'group': group, 'error_message': 'User is already a member!', 'inviteform': True})
             elif Invite.objects.filter(invitee=request.user, invited=invited, toGroup=group).exists():
                 # invited is already invited
                 return render(request, 'group_owner.html',
-                              {'group': group, 'erro': 'User is already invited!', 'inviteform': True})
+                              {'group': group, 'error_message': 'User is already invited!', 'inviteform': True})
             else:
                 invite = Invite.objects.create(invitee=request.user, invited=invited, toGroup=group)
                 invite.save()
@@ -369,7 +366,7 @@ def send_group_invite(request, group_name):
                 return HttpResponseRedirect(reverse('dropbox:group', args=(group_name,)))
         else:
             return render(request, 'group_owner.html',
-                          {'group': group, 'erro': 'No user found!', 'inviteform': True})
+                          {'group': group, 'error_message': 'No user found!', 'inviteform': True})
     else:
         return HttpResponseRedirect(reverse('dropbox:index'))
 
@@ -402,10 +399,10 @@ def save_group(request):
             return HttpResponseRedirect(reverse('dropbox:groups'))
         else:
             print(form.errors)
-            return render(request, 'create_group.html', {'form': form, 'erro': 'Group name already taken!'})
+            return render(request, 'create_group.html', {'form': form, 'error_message': 'Group name already taken!'})
     else:
         form = GroupForm()
-        return render(request, 'create_group.html', {'form': form, 'erro': 'Group name already taken!'})
+        return render(request, 'create_group.html', {'form': form, 'error_message': 'Group name already taken!'})
 
 
 def user(request, username):

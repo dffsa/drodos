@@ -1,6 +1,5 @@
-{% extends 'base2.html' %}
+{% extends 'base.html' %}
 {% load static %}
-
 {% block body %}
 
     <script src="{% static 'dropbox/js/dropzone.js' %}"></script>
@@ -18,21 +17,27 @@
         {% csrf_token %}
         <div class="butSide">
             <div class="butContainer">
-                <input type="file" name="filesInputId" id="filesInputId" class="inputfile"/>
-                <label for="file" id="fileLabel" style="max-width: 150px"><span>Chose file</span></label>
-                <input type=checkbox name="private" id="checkbox">
-                <label for="checkbox">Private file</label>
-                <button type="submit" class="skillBut" style="margin-left: 20px"><span>Upload</span></button>
-                <script src="{% static 'dropbox/js/customFileInput.js' %}"></script>
+                {% if user.is_authenticated %}
+                    <input type="file" name="filesInputId" id="filesInputId" class="inputfile"/>
+                    <label for="file" id="fileLabel" style="max-width: 150px"><span>Chose file</span></label>
+                    <input type=checkbox name="private" id="checkbox">
+                    <label for="checkbox">Private file</label>
+                    <button type="submit" class="skillBut" style="margin-left: 20px"><span>Upload</span></button>
+                    <script src="{% static 'dropbox/js/customFileInput.js' %}"></script>
+                {% else %}
+                    <input type="file" name="filesInputId" id="filesInputId" class="inputfile"  />
+                    <label for="file" id="fileLabel" style="max-width: 150px"><span>Chose file</span></label>
+                    <button type="submit" class="skillBut" style="margin-left: 20px"><span>Upload</span></button>
+                    <script src="{% static 'dropbox/js/customFileInput.js' %}"></script>
+                {% endif %}
             </div>
         </div>
-
         <div class="textSide" style="padding-top: 0">
             <p class="pNom"><input type="text" class="roundText" name="desc" placeholder="Description"></p>
         </div>
-        <div class="errorDisplay">
-            {% if erro %}
-                {{ erro }}
+        <div class="error_messagerDisplay">
+            {% if error_messager_message %}
+                {{ error_messager_message }}
             {% endif %}
         </div>
     </form>
