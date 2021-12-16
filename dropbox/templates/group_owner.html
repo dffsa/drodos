@@ -1,8 +1,8 @@
-{% extends 'group.html' %}
+{% extends 'group_member.html' %}
 
 {% block body2 %}
     <div class="butContainer" id="adminGroupActionsContainer">
-        <a href="{% url 'dropbox:invitemember' group.name %}"><button class="skillBut"><span>Invite Member</span></button></a>
+        <a href="{% url 'dropbox:group_invite_member' group.name %}"><button class="skillBut"><span>Invite Member</span></button></a>
         <a href="{% url 'dropbox:removemember' group.name %}"><button class="skillBut"><span>Kick Member</span></button></a>
         <a href="{% url 'dropbox:deletegroup' group.name %}"><button class="skillBut"><span>Delete Group</span></button></a>
     </div>
@@ -29,7 +29,7 @@
 
         <div class="tbox" style="padding-bottom: 0; padding-top: 10px"><h4>User to kick:</h4></div>
 
-        <form action="{% url 'dropbox:removedmember' group.name%}" method="post" >
+        <form action="{% url 'dropbox:removemember' group.name%}" method="post" >
         {% csrf_token %}
         {% for user in group.member.all %}
             {% if user.username != group.owner.username %}

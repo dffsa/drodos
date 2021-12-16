@@ -15,13 +15,13 @@
         <div class="tbox"><h1>You don't belong to any group ☹</h1></div>
     {% endif %}
 
-    <form action="{% url 'dropbox:managegroups'%}" method="post">
+    <form method="post">
         {% csrf_token %}
         <div class="tbox">
             {% if user.profile.premium %}
-                <button type="submit" name="op" value="create" class="skillBut"><span>Create a group</span></button>
+                <button type="submit" formaction="{% url 'dropbox:create_group'%}" class="skillBut"><span>Create a group</span></button>
             {% endif %}
-            <button type="submit" name="op" value="inv" class="skillBut"><span>My Invites</span></button>
+            <button type="submit" formaction="{% url 'dropbox:invites'%}" class="skillBut"><span>My Invites</span></button>
         </div>
     </form>
 

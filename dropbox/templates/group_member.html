@@ -18,15 +18,15 @@
 
             <div class="normal-box" id="groupFiles">
                 <h2 style="margin: 20px 0 20px 0;">Files</h2>
-            {% for storeditem in group.item.all %}
+            {% for item in group.item.all %}
                 <div class="listing" style="margin: 0 20px -1px 20px; width: auto">
-                    <a href="{% url 'dropbox:file' storeditem.fileUrl%}">{{ storeditem.title }}</a>
-                    <span>{{ storeditem.description }}</span>
+                    <a href="{% url 'dropbox:file' item.fileUrl%}">{{ item.fileUrl }}</a>
+                    <span>{{ item.description }}</span>
                 </div>
             {% endfor %}
             </div>
         </div>
-    {% endif %} <!-- memes-->
+    {% endif %}
 
     <div class="container" id="groupActionsContainer">
         <div class="butContainer" id="normalGroupActionsContainer">
@@ -44,12 +44,12 @@
 
             <div class="tbox" style="padding-bottom: 0"><h4>File to add:</h4></div>
 
-            <form action="{% url 'dropbox:addedfile' group.name%}" method="post" >
+            <form action="{% url 'dropbox:addfile' group.name%}" method="post" >
             {% csrf_token %}
-            {% for storeditem in useritems %}
+            {% for item in useritems %}
                 <div class="listing">
-                    <button type="submit" name="storeditem" value="{{ storeditem.id }}"><span>{{ storeditem.title }}</span></button>
-                    <span>{{ storeditem.description }}</span>
+                    <button type="submit" name="storeditem" value="{{ item.id }}"><span>{{ item.fileUrl }}</span></button>
+                    <span>{{ item.description }}</span>
                 </div>
             {% endfor %}
             </form>
@@ -63,12 +63,12 @@
         {% if usergroupitems  %}
             <div class="tbox"><h4>File to remove:</h4></div>
 
-            <form action="{% url 'dropbox:removedfile' group.name%}" method="post" >
+            <form action="{% url 'dropbox:removefile' group.name%}" method="post" >
             {% csrf_token %}
-            {% for storeditem in usergroupitems %}
+            {% for item in usergroupitems %}
                 <div class="listing">
-                    <button type="submit" name="storeditem" value="{{ storeditem.id }}"><span>{{ storeditem.title }}</span></button>
-                <span>{{ storeditem.description }}</span>
+                    <button type="submit" name="storeditem" value="{{ item.fileUrl }}"><span>{{ item.fileUrl }}</span></button>
+                <span>{{ item.description }}</span>
             </div>
             {% endfor %}
              </form>

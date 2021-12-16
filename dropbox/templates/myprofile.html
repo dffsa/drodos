@@ -8,7 +8,7 @@
             <div class="tbox"><h3>Premium User!</h3></div>
         {% endif %}
         <div class="tbox">
-            Storage : {{ user.profile.currentStorage }}Kb out of {{ user.profile.maxStorage}} Kb<br>
+            Storage : {{ user.profile.currentStorage }} out of {{ user.profile.maxStorage}} <br>
             <progress max="{{ user.profile.maxStorage }}" value="{{ user.profile.currentStorage }}"></progress>
         </div>
         <div class="tbox">

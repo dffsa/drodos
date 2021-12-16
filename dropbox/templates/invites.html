@@ -9,7 +9,7 @@
             {% for invite in invites %}
                 <li>
                     <p class="pNom">From: <a href="{% url 'dropbox:user' invite.invitee.username %}" style="color: black">{{ invite.invitee }}</a></p>
-                    <p class="pNom">To Group: <a href="{% url 'dropbox:viewgroup' invite.toGroup.name %}" style="color: black">{{ invite.toGroup }}</a></p>
+                    <p class="pNom">To Group: <a href="{% url 'dropbox:group' invite.toGroup.name %}" style="color: black">{{ invite.toGroup }}</a></p>
                     <form action="{% url 'dropbox:answerinvite' invite.id%}" method="post" style="color: black">
                         {% csrf_token %}
                         <input type="submit" value="Accept" name="op"/>

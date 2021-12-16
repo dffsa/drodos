@@ -1,3 +1,3 @@
-#!/usr/bin/env bash
+#!/usr/bin/env /bin/bash
 python manage.py migrate
 python manage.py runserver 0.0.0.0:8000

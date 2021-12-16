@@ -15,8 +15,7 @@ def index(request):
     print(User.objects.all())
     print('currently logged in as :' + request.user.username)
     if request.user.is_authenticated:
-        files = StoredItem.objects.filter(owner=request.user)
-        return render(request, 'home.html', {'files': files, 'user': request.user})
+        return render(request, 'home.html')
     else:
         return render(request, 'index.html')
 
@@ -58,7 +57,7 @@ def login(request):
 
         if user is not None:
             d_login(request, user)
-            return HttpResponseRedirect(reverse('dropbox:myprofile'))
+            return HttpResponseRedirect(reverse('dropbox:my_profile'))
         else:
             return HttpResponseRedirect(reverse('dropbox:login'))
     else:
@@ -70,7 +69,7 @@ def logout(request):
     return HttpResponseRedirect(reverse('dropbox:index'))
 
 
-def myprofile(request):
+def my_profile(request):
     if request.user.is_authenticated:
         return render(request, 'myprofile.html', {'user': request.user})
     else:
@@ -137,22 +136,18 @@ def download(request, filename):
                 return HttpResponseRedirect(reverse('dropbox:index'))
         else:  # no download to anon
             return HttpResponseRedirect(reverse('dropbox:index'))
-
     else:  # public to download
         fb = FileSystemStorage()
         path = fb.path(filename)
-        print(storeditem)
         with open(path, 'rb') as f:
             response = HttpResponse(f.read(), content_type="application/download")
             response['Content-Disposition'] = 'inline; filename=' + filename
-            print('file downloaded')
             return response
 
 
 def files(request):
     if request.user.is_authenticated:
-        files = StoredItem.objects.filter(owner=request.user)
-        return render(request, 'files.html', {'files': files})
+        return render(request, 'files.html', {'files': StoredItem.objects.filter(owner=request.user)})
     else:
         return HttpResponseRedirect(reverse('dropbox:index'))
 
@@ -165,7 +160,8 @@ def file(request, filename):
             return render(request, 'file.html', {'storeditem': storeditem})
         else:
             if not storeditem.private or storeditem.sharedwith(request.user):
-                return render(request, 'viewfile2.html', {'storeditem': storeditem})
+                if request.user.is_authenticated:
+                    return render(request, 'viewfile2.html', {'storeditem': storeditem})
             else:
                 return HttpResponseRedirect(reverse('dropbox:index'))
     else:
@@ -177,99 +173,116 @@ def file(request, filename):
 
 def groups(request):
     if request.user.is_authenticated:
-        groups = Group.objects.filter(member=request.user)
-        return render(request, 'groups.html', {'groups': groups, 'user': request.user})
+        return render(request, 'groups.html',
+                      {'groups': Group.objects.filter(member=request.user), 'user': request.user})
     else:
         return render(request, 'index.html')
 
 
-def group(request, groupname):
+def group(request, group_name):
     if request.user.is_authenticated:
-        group = get_object_or_404(Group, name=groupname)
+        group = get_object_or_404(Group, name=group_name)
         if group.ismember(request.user):
-            useritems = StoredItem.objects.filter(owner=request.user)
-            if group.isowner(request.user):  # group owner
-                return render(request, 'groupowner.html', {'group': group, 'useritems': useritems})
-            else:  # groupmember
-                return render(request, 'group.html', {'group': group, 'useritems': useritems})
+            user_items = StoredItem.objects.filter(owner=request.user)
+            if group.isowner(request.user):  # display group owner template
+                return render(request, 'group_owner.html', {'group': group, 'user_items': user_items})
+            else:  # display group member template
+                return render(request, 'group_member.html', {'group': group, 'user_items': user_items})
         else:  # not a member
-            # mostrar aqui perfil do grupo para o user que for convidado poder ver
+            # display group profile to the invitee
+            group = get_object_or_404(Group, name=group_name)
+            return render(request, 'view_group.html', {'group': group})
+    else:
+        return HttpResponseRedirect(reverse('dropbox:index'))
+
+
+def create_group(request):
+    if request.user.is_authenticated and request.user.profile.premium:
+        form = GroupForm()
+        return render(request, 'create_group.html', {'form': form})
+    else:
+        return HttpResponseRedirect(reverse('dropbox:index'))
+
+
+def invites(request):
+    if request.user.is_authenticated:
+        return render(request, 'invites.html', {'invites': Invite.objects.filter(invited=request.user)})
+    else:
+        return HttpResponseRedirect(reverse('dropbox:index'))
+
+
+def group_invite_member(request, group_name):
+    group = get_object_or_404(Group, name=group_name)
+    if request.user.is_authenticated and group.isowner(request.user):
+        return render(request, 'group_owner.html', {'inviteform': True, 'group': group})
+    else:
+        return HttpResponseRedirect(reverse('dropbox:index'))
+
+
+def add_file(request, group_name):
+    group = get_object_or_404(Group, name=group_name)
+    if request.method == 'GET':
+        if request.user.is_authenticated and group.ismember(request.user):
+            user_items = StoredItem.objects.filter(owner=request.user)
+            if group.isowner(request.user):
+                return render(request, 'group_owner.html', {'addfileform': True, 'group': group,
+                                                            'useritems': user_items})
+            else:
+                return render(request, 'group_member.html', {'addfileform': True, 'group': group,
+                                                             'useritems': user_items})
+        else:
             return HttpResponseRedirect(reverse('dropbox:index'))
-    else:
-        return HttpResponseRedirect(reverse('dropbox:index'))
+    elif request.method == 'POST':
+        if request.user.is_authenticated and group.ismember(request.user) and request.POST.get('storeditem'):
+            item = StoredItem.objects.get(pk=request.POST['storeditem'])
+            if not group.hasitem(item):
+                group.item.add(item)
+                group.save()
+                return HttpResponseRedirect(reverse('dropbox:group', args=(group_name,)))
+            else:
+                useritems = StoredItem.objects.filter(owner=request.user)
+                if group.isowner(request.user):
+                    return render(request, 'group_owner.html', {'addfileform': True, 'group': group,
+                                                                'useritems': useritems,
+                                                                'erro': 'File is already added in the group!'})
+                else:
+                    return render(request, 'group_member.html', {'addfileform': True, 'group': group,
+                                                                 'useritems': useritems,
+                                                                 'erro': 'File is already added in the group!'})
+    return HttpResponseRedirect(reverse('dropbox:index'))
 
 
-def viewgroup(request, groupname):
-    if request.user.is_authenticated:
-        group = get_object_or_404(Group, name=groupname)
-        return render(request, 'viewgroup.html', {'group': group})
-    else:
-        return HttpResponseRedirect(reverse('dropbox:index'))
-
-
-def managegroups(request):
-    if request.user.is_authenticated:
-        groups = Group.objects.filter(member=request.user)
-        if request.POST['op'] == 'create':
-            return HttpResponseRedirect(reverse('dropbox:creategroup'))
-        elif request.POST['op'] == 'inv':
-            return HttpResponseRedirect(reverse('dropbox:invites'))
-        else:  # invalid op
-            return HttpResponseRedirect(reverse('dropbox:groups', args=(groups,)))
-    else:
-        return render(request, 'index.html')
-
-
-def invitemember(request, groupname):
-    group = get_object_or_404(Group, name=groupname)
-    if request.user.is_authenticated and group.isowner(request.user):
-        return render(request, 'groupowner.html', {'inviteform': True, 'group': group})
-    else:
-        return HttpResponseRedirect(reverse('dropbox:index'))
-
-
-def removemember(request, groupname):
-    group = get_object_or_404(Group, name=groupname)
-    if request.user.is_authenticated and group.isowner(request.user):
-        return render(request, 'groupowner.html', {'removeform': True, 'group': group})
-    else:
-        return HttpResponseRedirect(reverse('dropbox:index'))
-
-
-def addfile(request, groupname):
-    group = get_object_or_404(Group, name=groupname)
-    if request.user.is_authenticated and group.ismember(request.user):
-        useritems = StoredItem.objects.filter(owner=request.user)
-        if group.isowner(request.user):
-            return render(request, 'groupowner.html', {'addfileform': True, 'group': group,
-                                                       'useritems': useritems})
+def remove_file(request, group_name):
+    group = get_object_or_404(Group, name=group_name)
+    if request.method == 'GET':
+        if request.user.is_authenticated and group.ismember(request.user):
+            group_files = group.item.all()
+            print(group_files)
+            if group.isowner(request.user):
+                return render(request, 'group_owner.html', {'removefileform': True, 'group': group,
+                                                            'usergroupitems': group_files})
+            else:
+                usergroupitems = []
+                for storeditem in group_files:
+                    if group.hasitem(storeditem):
+                        usergroupitems.append(storeditem)
+                return render(request, 'group_member.html', {'removefileform': True, 'group': group,
+                                                             'usergroupitems': usergroupitems})
         else:
-            return render(request, 'group.html', {'addfileform': True, 'group': group,
-                                                  'useritems': useritems})
-    else:
-        return HttpResponseRedirect(reverse('dropbox:index'))
+            return HttpResponseRedirect(reverse('dropbox:index'))
+    elif request.method == 'POST':
+        if request.user.is_authenticated and group.ismember(request.user) and request.POST.get('storeditem'):
+            item = StoredItem.objects.get(fileUrl=request.POST['storeditem'])
+            if group.hasitem(item) and (item.owner == request.user or group.isowner(request.user)):
+                group.item.remove(item)
+                group.save()
+                return HttpResponseRedirect(reverse('dropbox:group', args=(group_name,)))
+            else:  # user is a member but is trying to remove a file of another member
+                return HttpResponseRedirect(reverse('dropbox:group', args=(group_name,)))
+    return HttpResponseRedirect(reverse('dropbox:index'))
 
 
-def removefile(request, groupname):
-    group = get_object_or_404(Group, name=groupname)
-    if request.user.is_authenticated and group.ismember(request.user):
-        useritems = StoredItem.objects.filter(owner=request.user)
-        if group.isowner(request.user):
-            return render(request, 'groupowner.html', {'removefileform': True, 'group': group,
-                                                       'useritems': useritems})
-        else:
-            usergroupitems = []
-            for storeditem in useritems:
-                if group.hasitem(storeditem):
-                    usergroupitems.append(storeditem)
-            print(usergroupitems)
-            return render(request, 'group.html', {'removefileform': True, 'group': group,
-                                                  'usergroupitems': usergroupitems})
-    else:
-        return HttpResponseRedirect(reverse('dropbox:index'))
-
-
-def deletefile(request, filename):
+def delete_file(request, filename):
     storeditem = get_object_or_404(StoredItem, fileUrl=filename)
     if request.user == storeditem.owner:
         storeditem.delete()
@@ -284,7 +297,7 @@ def deletefile(request, filename):
         return HttpResponseRedirect(reverse('dropbox:index'))
 
 
-def changesettings(request, filename):
+def change_settings(request, filename):
     storeditem = get_object_or_404(StoredItem, fileUrl=filename)
     if request.user == storeditem.owner and request.user.profile.premium:
         if storeditem.private:
@@ -299,8 +312,8 @@ def changesettings(request, filename):
         return HttpResponseRedirect(reverse('dropbox:index'))
 
 
-def leavegroup(request, groupname):
-    group = get_object_or_404(Group, name=groupname)
+def leave_group(request, group_name):
+    group = get_object_or_404(Group, name=group_name)
     if request.user.is_authenticated and group.ismember(request.user):
         group.member.remove(request.user)
         print('left group')
@@ -309,7 +322,7 @@ def leavegroup(request, groupname):
         return HttpResponseRedirect(reverse('dropbox:index'))
 
 
-def deletegroup(request, groupname):
+def delete_group(request, groupname):
     group = get_object_or_404(Group, name=groupname)
     if request.user.is_authenticated and group.isowner(request.user):
         group.delete()
@@ -319,114 +332,51 @@ def deletegroup(request, groupname):
         return HttpResponseRedirect(reverse('dropbox:index'))
 
 
-def removedmember(request, groupname):
-    group = get_object_or_404(Group, name=groupname)
-    if request.user.is_authenticated and group.isowner(request.user):
-        if not request.POST.get('user'):
-            return HttpResponseRedirect(reverse('dropbox:group', args=(groupname,)))
+def remove_member(request, group_name):
+    group = get_object_or_404(Group, name=group_name)
+    if request.method == 'GET':
+        if request.user.is_authenticated and group.isowner(request.user):
+            return render(request, 'group_owner.html', {'removeform': True, 'group': group})
         else:
-            toberemoved = User.objects.get(pk=request.POST['user'])
-            if toberemoved != group.owner:
-                group.member.remove(toberemoved)
+            return HttpResponseRedirect(reverse('dropbox:index'))
+    elif request.method == 'POST':
+        if request.user.is_authenticated and group.isowner(request.user) and request.POST.get('user'):
+            user_to_remove = User.objects.get(pk=request.POST['user'])
+            if user_to_remove != group.owner and group.ismember(user_to_remove):
+                group.member.remove(user_to_remove)
                 group.save()
-                print('user removed')
-                return HttpResponseRedirect(reverse('dropbox:group', args=(groupname,)))
-            else:
-                return HttpResponseRedirect(reverse('dropbox:index'))
+                return HttpResponseRedirect(reverse('dropbox:group', args=(group_name,)))
     return HttpResponseRedirect(reverse('dropbox:index'))
 
 
-def addedfile(request, groupname):
-    group = get_object_or_404(Group, name=groupname)
-    if request.user.is_authenticated and group.ismember(request.user):
-        if not request.POST.get('storeditem'):
-            return HttpResponseRedirect(reverse('dropbox:group', args=(groupname,)))
-        else:
-            item = StoredItem.objects.get(pk=request.POST['storeditem'])
-            if not group.hasitem(item):
-                group.item.add(item)
-                group.save()
-                print('file has been added')
-                return HttpResponseRedirect(reverse('dropbox:group', args=(groupname,)))
-            else:
-                useritems = StoredItem.objects.filter(owner=request.user)
-                if group.isowner(request.user):
-                    return render(request, 'groupowner.html', {'addfileform': True, 'group': group,
-                                                               'useritems': useritems,
-                                                               'erro': 'File is already added in the group!'})
-                else:
-                    return render(request, 'group.html', {'addfileform': True, 'group': group,
-                                                          'useritems': useritems,
-                                                          'erro': 'File is already added in the group!'})
-    else:
-        return HttpResponseRedirect(reverse('dropbox:index'))
-
-
-def removedfile(request, groupname):
-    group = get_object_or_404(Group, name=groupname)
-    if request.user.is_authenticated and group.ismember(request.user):
-        if not request.POST.get('storeditem'):
-            return HttpResponseRedirect(reverse('dropbox:group', args=(groupname,)))
-        else:
-            item = StoredItem.objects.get(pk=request.POST['storeditem'])
-            if group.hasitem(item):
-                if item.owner == request.user or group.isowner(request.user):
-                    group.item.remove(item)
-                    group.save()
-                    print('file has been removed')
-                    return HttpResponseRedirect(reverse('dropbox:group', args=(groupname,)))
-                else:
-                    return HttpResponseRedirect(reverse('dropbox:group', args=(groupname,)))
-            else:
-                return HttpResponseRedirect(reverse('dropbox:group', args=(groupname,)))
-    else:
-        return HttpResponseRedirect(reverse('dropbox:index'))
-
-
-def sendgroupinvite(request, groupname):
-    group = get_object_or_404(Group, name=groupname)
+def send_group_invite(request, group_name):
+    group = get_object_or_404(Group, name=group_name)
     if request.user.is_authenticated and group.isowner(request.user):
         if User.objects.filter(username=request.POST['username']).exists():
             invited = get_object_or_404(User, username=request.POST['username'])
             if group.ismember(invited):
                 # invited is already a member
-                return render(request, 'groupowner.html',
+                return render(request, 'group_owner.html',
                               {'group': group, 'erro': 'User is already a member!', 'inviteform': True})
             elif Invite.objects.filter(invitee=request.user, invited=invited, toGroup=group).exists():
                 # invited is already invited
-                return render(request, 'groupowner.html',
+                return render(request, 'group_owner.html',
                               {'group': group, 'erro': 'User is already invited!', 'inviteform': True})
             else:
                 invite = Invite.objects.create(invitee=request.user, invited=invited, toGroup=group)
                 invite.save()
                 print('invite sent')
-                return HttpResponseRedirect(reverse('dropbox:group', args=(groupname,)))
+                return HttpResponseRedirect(reverse('dropbox:group', args=(group_name,)))
         else:
-            return render(request, 'groupowner.html',
+            return render(request, 'group_owner.html',
                           {'group': group, 'erro': 'No user found!', 'inviteform': True})
     else:
         return HttpResponseRedirect(reverse('dropbox:index'))
 
 
-def creategroup(request):
-    if request.user.is_authenticated and request.user.profile.premium:
-        form = GroupForm()
-        return render(request, 'creategroup.html', {'form': form})
-    else:
-        return HttpResponseRedirect(reverse('dropbox:index'))
-
-
-def invites(request):
+def answer_invite(request, group_id):
     if request.user.is_authenticated:
-        invites = Invite.objects.filter(invited=request.user)
-        return render(request, 'invites.html', {'invites': invites})
-    else:
-        return HttpResponseRedirect(reverse('dropbox:index'))
-
-
-def answerinvite(request, groupid):
-    if request.user.is_authenticated:
-        invite = Invite.objects.get(id=groupid)
+        invite = Invite.objects.get(id=group_id)
         if request.POST['op'] == 'Accept':
             invite.toGroup.member.add(invite.invited)
             invite.toGroup.save()
@@ -441,7 +391,7 @@ def answerinvite(request, groupid):
         return HttpResponseRedirect(reverse('dropbox:index'))
 
 
-def savegroup(request):
+def save_group(request):
     if not Group.objects.filter(name=request.POST['name']).exists():
         form = GroupForm(request.POST)
         if form.is_valid():
@@ -452,16 +402,16 @@ def savegroup(request):
             return HttpResponseRedirect(reverse('dropbox:groups'))
         else:
             print(form.errors)
-            return render(request, 'creategroup.html', {'form': form, 'erro': 'Group name already taken!'})
+            return render(request, 'create_group.html', {'form': form, 'erro': 'Group name already taken!'})
     else:
         form = GroupForm()
-        return render(request, 'creategroup.html', {'form': form, 'erro': 'Group name already taken!'})
+        return render(request, 'create_group.html', {'form': form, 'erro': 'Group name already taken!'})
 
 
 def user(request, username):
     if request.user.is_authenticated:
         if request.user.username == username:
-            return HttpResponseRedirect(reverse('dropbox:myprofile'))
+            return HttpResponseRedirect(reverse('dropbox:my_profile'))
         else:
             user = get_object_or_404(User, username=username)
             return render(request, 'user.html', {'user': user})
@@ -476,25 +426,21 @@ def premium(request):
         return HttpResponseRedirect(reverse('dropbox:index'))
 
 
-def gopremium(request):
+def go_premium(request):
     if request.user.is_authenticated:
         request.user.profile.premium = True
         request.user.profile.maxStorage = 1000000000
         request.user.save()
-        return HttpResponseRedirect(reverse('dropbox:myprofile'))
+        return HttpResponseRedirect(reverse('dropbox:my_profile'))
     else:
         return HttpResponseRedirect(reverse('dropbox:index'))
 
 
-def gonormal(request):
+def go_normal(request):
     if request.user.is_authenticated:
         request.user.profile.premium = False
         request.user.profile.maxStorage = 10000000
         request.user.save()
-        return HttpResponseRedirect(reverse('dropbox:myprofile'))
+        return HttpResponseRedirect(reverse('dropbox:my_profile'))
     else:
         return HttpResponseRedirect(reverse('dropbox:index'))
-
-
-def testing(request):
-    return render(request, 'testing.html')
