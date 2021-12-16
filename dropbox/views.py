@@ -322,8 +322,8 @@ def leave_group(request, group_name):
         return HttpResponseRedirect(reverse('dropbox:index'))
 
 
-def delete_group(request, groupname):
-    group = get_object_or_404(Group, name=groupname)
+def delete_group(request, group_name):
+    group = get_object_or_404(Group, name=group_name)
     if request.user.is_authenticated and group.isowner(request.user):
         group.delete()
         print('group deleted')
