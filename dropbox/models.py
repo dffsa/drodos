@@ -12,7 +12,7 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, unique=True)
     bio = models.TextField(max_length=500, blank=True, null=True)
     premium = models.BooleanField(default=False)
-    maxStorage = models.IntegerField(default=10000000)
+    maxStorage = models.IntegerField(default=500)
     currentStorage = models.IntegerField(default=0)
 
     @receiver(post_save, sender=User)

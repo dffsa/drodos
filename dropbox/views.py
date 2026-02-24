@@ -83,7 +83,7 @@ def upload(request):
             if request.user.is_authenticated:
                 for f in files:
                     filename = fs.save(fs.get_available_name(f.name), f)
-                    size = fs.size(filename)
+                    size = fs.size(filename)/1000000 # convert to Mb
                     if request.user.profile.currentStorage + size > request.user.profile.maxStorage:
                         fs.delete(filename)
                         # return render(request, 'home.html',
@@ -104,8 +104,8 @@ def upload(request):
             else:  # unregistered user upload
                 for f in files:
                     filename = fs.save(fs.get_available_name(f.name), f)
-                    size = fs.size(filename)
-                    if size > 1000000:
+                    size = fs.size(filename)/1000000 # convert to Mb
+                    if size > 100:
                         fs.delete(filename)
                         # return render(request, 'home.html',
                         #             {'error_message': 'File too big!'}
@@ -284,7 +284,7 @@ def delete_file(request, filename):
     if request.user == storeditem.owner:
         storeditem.delete()
         fs = FileSystemStorage()
-        size = int(fs.size(filename) / 1000)
+        size = int(fs.size(filename) / 1000000)
         print(size)
         request.user.profile.currentStorage -= size
         request.user.save()
