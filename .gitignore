@@ -4,5 +4,9 @@ data
 .env
 
 # python cache files
-*/__pycache__/
-*/migrations/
+__pycache__/
+
+# Ignore compiled Python files
+*.pyc
+*.pyo
+*.pyd
