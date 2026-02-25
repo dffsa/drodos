@@ -25,7 +25,7 @@ SECRET_KEY = 'dy982xgdr#&qf1qhf-w3vw6)0v0ctcz)6ddm#@q7hn-fxn%e!)'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -54,8 +54,8 @@ MIDDLEWARE = [
 ]
 
 CORS_ORIGIN_WHITELIST = [
-    'http://localhost:3000',
-    'http://0.0.0.0:3000'
+    'http://localhost:8003',
+    'http://0.0.0.0:8003'
 ]
 
 ROOT_URLCONF = 'drodos.urls'
@@ -127,10 +127,10 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'drodos/static/')
-STATIC_URL = '/static/'
+STATIC_ROOT = "/app/static"
+MEDIA_ROOT = "/data/media"
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'data/media/')  # server dir
+STATIC_URL = '/static/'
 MEDIA_URL = '/media/'  # relative url for users
 
 # check --deploy warnings

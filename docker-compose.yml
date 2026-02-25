@@ -1,28 +1,31 @@
 services:
   db:
     image: postgres:15
-    restart: always
+    restart: unless-stopped
     environment:
-      - POSTGRES_DB=postgres
-      - POSTGRES_USER=$drodos_postgres_user
-      - POSTGRES_PASSWORD=$drodos_postgres_password
+      POSTGRES_DB: drodos
+      POSTGRES_USER: ${drodos_postgres_user}
+      POSTGRES_PASSWORD: ${drodos_postgres_password}
     volumes:
-      - db_data:/var/lib/postgresql/data:Z  # create volume for DB persistence
+      - db_data:/var/lib/postgresql/data
+
   web:
     build: .
-    restart: always
+    restart: unless-stopped
     environment:
-      - POSTGRES_DB=postgres
-      - POSTGRES_USER=$drodos_postgres_user
-      - POSTGRES_PASSWORD=$drodos_postgres_password
-    entrypoint: /drodos/entrypoint_dev.sh
+      POSTGRES_DB: drodos
+      POSTGRES_USER: ${drodos_postgres_user}
+      POSTGRES_PASSWORD: ${drodos_postgres_password}
+      DJANGO_SETTINGS_MODULE: drodos.settings
     volumes:
-      - ./drodos:/drodos/drodos:Z     # bind drodos folder to host os
-      - ./dropbox:/drodos/dropbox:Z   # bind app folder to host os
-      - ./media:/data/media:Z #bind drodos file storage
+      - static_volume:/app/static
+      - media_volume:/data/media
     ports:
-      - "8000:8000"
+      - "8003:8000"
     depends_on:
       - db
+
 volumes:
   db_data:
+  static_volume:
+  media_volume:
