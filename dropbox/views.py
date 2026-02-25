@@ -426,7 +426,7 @@ def premium(request):
 def go_premium(request):
     if request.user.is_authenticated:
         request.user.profile.premium = True
-        request.user.profile.maxStorage = 1000000000
+        request.user.profile.maxStorage = 5000
         request.user.save()
         return HttpResponseRedirect(reverse('dropbox:my_profile'))
     else:
@@ -436,7 +436,7 @@ def go_premium(request):
 def go_normal(request):
     if request.user.is_authenticated:
         request.user.profile.premium = False
-        request.user.profile.maxStorage = 10000000
+        request.user.profile.maxStorage = 500
         request.user.save()
         return HttpResponseRedirect(reverse('dropbox:my_profile'))
     else:

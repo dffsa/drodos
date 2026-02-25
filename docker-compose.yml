@@ -7,7 +7,7 @@ services:
       POSTGRES_USER: ${drodos_postgres_user}
       POSTGRES_PASSWORD: ${drodos_postgres_password}
     volumes:
-      - db_data:/var/lib/postgresql/data
+      - db_data:/var/lib/postgresql/data:Z
 
   web:
     build: .
@@ -18,8 +18,8 @@ services:
       POSTGRES_PASSWORD: ${drodos_postgres_password}
       DJANGO_SETTINGS_MODULE: drodos.settings
     volumes:
-      - static_volume:/app/static
-      - media_volume:/data/media
+      - static_volume:/app/static:Z
+      - media_volume:/data/media:Z
     ports:
       - "8003:8000"
     depends_on:
